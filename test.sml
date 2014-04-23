@@ -1,25 +1,43 @@
-app load ["Int", "Real", "Math"];
+load "Real";
 
-app use ["lib/map.sml"];
+app use ["priority_queue_functor.sml"];
+
+structure RealOrderable : ORDERABLE =
+struct
+  type t = Real.real
+  val compare = Real.compare
+end
+
+structure PQ = PriorityQueueFunctor(RealOrderable);
 
 
-signature CITY_GRAPH =
-sig
-  type node
-  type city
+val pq = PQ.empty
+val pq = PQ.insert pq "WAT" 1.0
+val pq = PQ.insert pq "HEJ" 0.0
+val (p, pq1) = PQ.pop pq
 
-  val fromFile : string -> city
 
-  val successors : city -> node -> (node * real * string) list
-end (* signature PRIORITY_QUEUE *)
+
+
+
+
+signature Graph =
+struct
+	
+end
+
 
 
 
 (* should probably be implemented as adjencency list *)
-structure CityGraph :> CITY_GRAPH =
+structure CityGraph =
 struct
-  type node = real * real
-  type city = (real * real, ((real * real) * real * string) list) Map.map
+  type identifier = real * real
+  type vertex = identifier * string
+  type arc    = identifier * identifier * string
+  type path   = arc list
+
+  type city = (vertex, (vertex * arc list) Map.map
 
   fun line2edge m line =
     case String.tokens Char.isSpace line
@@ -44,6 +62,7 @@ struct
     before TextIO.closeIn instream
 
   fun fromFile path = (read o TextIO.openIn) path
+
 
 
   (* (node, cost, edge) list *)

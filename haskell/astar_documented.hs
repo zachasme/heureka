@@ -52,7 +52,8 @@ astarSearch startNode isGoalNode nextNodeFn heuristic =
 
         gscore' = foldl' (\m (s, g, _) -> Map.insert s g m) gscore successors
           
-        -- Insert the tracks of the successors
+        -- Any of successor nodes that hadnt been in frontier yet, or if we found better g-score
+        -- needs to have their best predecessor set to current node
         tracks' = foldl' (\m (s, _, _) -> Map.insert s node m) tracks successors
 
     -- Finds the successors of a given node and their costs

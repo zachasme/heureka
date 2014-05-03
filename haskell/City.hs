@@ -1,6 +1,8 @@
 module City
 ( parse
 , successors
+, distance
+, 
 ) where
 
 
@@ -15,3 +17,7 @@ parseLine line = parseTokens $ words line
 
 
 main = print $ parseLine "hej hej vej hej ej"
+
+
+
+successors = 1

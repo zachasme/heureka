@@ -1,19 +1,25 @@
 import City
 import Astar
 
-src = "../data/citymap.txt"
+cityfilepath = "../data/citymap.txt"
 
 
 
---SktPedersStraede & Larsbjoernsstraede
---to the corner of Studiestraede & Larsbjoernsstraede.
+--SktPedersStraede & Larsbjoernsstraede 35 80
+--to the corner of Studiestraede & Larsbjoernsstraede 45 70
+
+
+-- direct distance between two nodes
+distance (x1,y1) (x2,y2) = 1
 
 
 main = do
-    content <- readFile src
-    let city = City.parse content
-    let origin = City.intersection "SktPedersStraede" "Larsbjoernsstraede"
-    let predicate x = x == origin
-    let successors = Graph.successors city
-    let heuristic = City.distance city origin
-    putStrLn $ Astar.search origin predicate successors heuristic
+    cityfile <- readFile cityfilepath
+    let city         = City.parse cityfile
+    let origin       = (45,70)
+    let destination  = (35,80)
+    --let predicate x  = x == destination
+    --let successors x = map (\(node,arc) -> (node, distance node x, arc)) $ City.successors x city
+    --let heuristic x  = distance x destination
+    --print $ Astar.search origin predicate successors heuristic
+    print $ cityfile

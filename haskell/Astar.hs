@@ -16,12 +16,12 @@ import qualified PriorityMap as PMap
 
 
 search :: (Ord a)
-       => a                    -- ^ origin:     node from which to start the search
-       -> (a -> Bool)          -- ^ predicate:  should return true for target nodes
+       => a                       -- ^ origin:  node from which to start the search
+       -> a                       -- ^ target:  node to aim for
        -> (a -> [(a, Double, b)]) -- ^ successors: a function that provides the next nodes, costs and arcs/etc
-       -> (a -> Double)        -- ^ heuristic:  a function that approximates future cost to nearest goal
-       -> Maybe [b]            -- ^ returns a path option
-search origin predicate successors heuristic =
+       -> (a -> Double)           -- ^ heuristic:  a function that approximates future cost to nearest goal
+       -> Maybe [b]               -- ^ returns a path option
+search origin target successors heuristic =
   let
     -- | frontier: prioritized queue of nodes (and their past-cost) to be checked
     -- sorted by fcost (which is best known distance from origin plus estimated distance to nearest target)
@@ -36,8 +36,8 @@ search origin predicate successors heuristic =
     inner frontier interior predecessors
       -- search has failed when frontier becomes empty
       | PQ.null frontier = Nothing
-      -- in case predicate holds, trace route from origin
-      | predicate current    = Just $ trace current predecessors
+      -- in case target is reached, trace route from origin
+      | origin == target = Just $ trace current predecessors
       -- skip nodes that have already been checked
         -- NOTE: NOT NEEDED BECAUSE OF FILTER DURING ITERAITONS
         -- Set.member node interior = inner frontier' interior predecessors

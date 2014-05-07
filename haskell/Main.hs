@@ -17,9 +17,7 @@ main = do
     cityfile <- readFile cityfilepath
     let city         = City.parse cityfile
     let origin       = (45,70)
-    let destination  = (35,80)
-    --let predicate x  = x == destination
-    --let successors x = map (\(node,arc) -> (node, distance node x, arc)) $ City.successors x city
-    --let heuristic x  = distance x destination
-    --print $ Astar.search origin predicate successors heuristic
-    print $ cityfile
+    let target       = (35,80)
+    let successors x = map (\(node,arc) -> (node, distance node x, arc)) $ City.successors x city
+    let heuristic x  = distance x target
+    print $ Astar.search origin target successors heuristic

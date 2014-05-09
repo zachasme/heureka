@@ -3,7 +3,7 @@ import Astar
 
 import Debug.Trace
 
-cityfilepath = "../data/citymap.txt"
+cityfilepath = "../data/testmap.txt"
 
 
 
@@ -23,8 +23,8 @@ distance (x1,y1) (x2,y2) = sqrt(dx*dx+dy*dy)
 main = do
 	cityfile <- readFile cityfilepath
 	let city         = City.parse cityfile
-	let origin       = City.intersection "SktPedersStraede" "Larsbjoernsstraede" city
-	let target       = City.intersection "Studiestraede"    "Larsbjoernsstraede" city
+	let origin       = (1,1)
+	let target       = (2,4)
 	let successors x = map (\(node,arc) -> (node, distance node x, arc)) $ City.successors x city
 	let heuristic x  = distance x target
 	print $ Astar.search heuristic successors origin target

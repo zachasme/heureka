@@ -62,27 +62,55 @@ parseline _         = Set.empty
 
 
 
-
+-- | attempts to prove the given conjecture from the given knowledge base
 refutationproof :: Clause -> [Clause] -> Maybe ([Clause],Double)
 refutationproof conjecture kb =
-	Astar.search heuristic successors origin target
+	Astar.search heuristic successors [origin] target
 	where
+		-- | refutation proofs start from the denial of the conjecture
 		origin = deny conjecture
+		-- | and we need to derive the empty set (a contradiction)
 		target = Set.empty
+		-- | the knowledge base is extended with the origin clause
+		kb' = origin:kb
+		-- | we encourage the search to use smaller clauses first
+		-- by estimating the full cost from the clause size
 		heuristic = fromIntegral . Set.size
+		-- | anestor lol
+		successors (x:xs)
+			= map (\resolvent -> (resolvent, 1)) $ resolveall x $ nub $ kb'++xs
+
+
+directproof conjecture kb =
+	Astar.search heuristic successors origins target
+	where
+		-- | direct proofs start from the knowledge base clauses
+		origins = kb
+		-- | and we need to derive the conjecture
+		target = conjecture
+		-- | we encourage the search to use smaller clauses first
+		-- by estimating the full cost from the clause size
+		heuristic = fromIntegral . Set.size
+		-- | anestor lol
 		successors (x:xs)
 			= map (\resolvent -> (resolvent, 1)) $ resolveall x $ nub $ kb++xs
 
 
-
-
 main = do
+	print "Refutation breakfast:"
 	datafile <- readFile "../data/breakfast.txt"
 	let kb = parse datafile
 	let conjecture = Set.fromList [Positive "breakfast"]
 	print $ refutationproof conjecture kb
 
+	print "Refutation ancestortest:"
 	datafile <- readFile "../data/ancestortest.txt"
 	let kb = parse datafile
 	let conjecture = Set.fromList [Positive "a", Positive "b"]
 	print $ refutationproof conjecture kb
+
+	print "Direct breakfast:"
+	datafile <- readFile "../data/breakfast.txt"
+	let kb = parse datafile
+	let conjecture = Set.fromList [Positive "breakfast"]
+	print $ directproof conjecture kb

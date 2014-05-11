@@ -18,18 +18,21 @@ import Debug.Trace
 -- and equatable (for testing whether goal has been reached)
 -- also showable for debugging (can safely be removed)
 search :: (Show a, Ord a, Eq a)
-       => (a -> Double)             -- ^ heuristic:  a function that approximates future cost to nearest goal
+       => (a -> Double)          -- ^ heuristic:  a function that approximates future cost to nearest goal
        -> ([a] -> [(a, Double)]) -- ^ successors: a function that provides the next nodes, costs and arcs/etc
-       -> a                         -- ^ origin:  node from which to start the search
-       -> a                         -- ^ target:  node to aim for
-       -> Maybe ([a],Double)        -- ^ returns a path option
-search heuristic successors origin target =
+       -> [a]                    -- ^ origins:  nodes from which to start the search
+       -> a                      -- ^ target:  node to aim for
+       -> Maybe ([a],Double)     -- ^ returns a path option
+search heuristic successors origins target =
   let
     -- | frontier: prioritized queue of nodes (and their past-cost) to be checked
     -- sorted by fcost (which is best known distance from origin plus estimated distance to nearest target)
-    frontier     = PMap.singleton (heuristic origin) origin 0
+    frontier = foldl
+      (\acc origin -> PMap.insert (heuristic origin) origin 0 acc)
+      PMap.empty
+      origins
     -- | interior: set of nodes which have alread been checked
-    interior     = Set.empty
+    interior = Set.empty
     -- | predecessors: keeps track of best predecessors
     predecessors = Map.empty
 

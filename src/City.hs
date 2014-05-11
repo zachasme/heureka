@@ -89,7 +89,7 @@ distance (x1,y1) (x2,y2) = sqrt(dx*dx+dy*dy)
 
 findroute :: Coordinate -> Coordinate -> City -> Maybe [Street]
 findroute origin target city =
-	case Astar.search heuristic successors' origin target of
+	case Astar.search heuristic successors' [origin] target of
 		Nothing -> Nothing
 		Just (path, cost) -> Just $ route (reverse path) city
 	where

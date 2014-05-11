@@ -1,0 +1,4 @@
+-- goal should be a b
+
+a if b
+b if a

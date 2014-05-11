@@ -2,7 +2,11 @@ module City
 ( parse
 , successors
 , intersection
+, route
 ) where
+
+import Data.List
+import Data.Maybe
 
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -57,6 +61,13 @@ intersection road1 road2 (_, i) =
 		(Just xs, Just ys) -> head $ Set.toList $ Set.intersection xs ys
 		_ -> error $ "Roads " ++ road1 ++ " and " ++ road2 ++ " do not cross"
 
+
+
+route (a:b:path) (adjecents,lol) = arc: (route (b:path) (adjecents,lol) )
+	where
+		succs = fromJust $ Map.lookup a adjecents
+		(node,arc) = fromJust $ find (\(succ,_) -> succ == b) succs
+route _ _ = []
 
 
 --main = print $ [1]

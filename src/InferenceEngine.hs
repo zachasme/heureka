@@ -36,6 +36,7 @@ parse :: String -> [Clause]
 parse text = map parseline (map words $ lines text)
 
 parseline :: [String] -> Clause
+parseline ("--":_) = []
 parseline ("if":xs) = map deny $ parseline xs
 parseline (x:xs) = (Positive x):parseline xs
 parseline _ = []
@@ -46,7 +47,17 @@ parseline _ = []
 
 
 
-datafilepath = "../data/breakfast.txt"
+datafilepath = "../data/ancestortest.txt"
+
+hypothesis = [Positive "a", Positive "b"]
+
+
+
+refutationproof conjecture kb =
+	Astar.search heuristic successors origin target
+	where
+		origin = map deny conjecture
+		target = []
 
 
 main = do
@@ -54,15 +65,15 @@ main = do
 	-- | compute knowledgebase
 	let kb = parse datafile
 	-- | assign hypthesis
-	let hypothesis = Positive "breakfast"
+	let hypothesis = [Positive "a", Positive "b"]
 
 	-- * REFUTATION-PROOF
 	-- | origin is denial of hypothesis
-	let origin = [deny hypothesis]
+	let origin = map deny hypothesis
 	-- | target is empty clause
 	let target = []
 
 	let heuristic x  = fromIntegral $ length x
-	let successors x = map (\resolvent -> (resolvent, 1, resolvent)) $ resolveall x kb
+	let successors (x:xs) = map (\resolvent -> (resolvent, 1)) $ resolveall x kb
 	--print $ resolveall origin kb
 	print $ Astar.search heuristic successors origin target

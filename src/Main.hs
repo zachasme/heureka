@@ -27,6 +27,9 @@ main = do
 	--let target       = City.intersection "Studiestraede" "Larsbjoernsstraede" city
 	let origin = (0,0)
 	let target = (9,9)
-	let successors x = map (\(node,arc) -> (node, distance node x, arc)) $ City.successors x city
+	let successors (x:_) = map (\(node,arc) -> (node, distance node x)) $ City.successors x city
+	    successors _     = []
 	let heuristic x  = distance x target
-	print $ Astar.search heuristic successors origin target
+	let (Just (path, pathcost)) = Astar.search heuristic successors origin target
+	print $ ("Path cost: " ++ show pathcost, City.route (reverse path) city)
+	--print path

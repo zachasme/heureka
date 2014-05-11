@@ -1,3 +1,5 @@
+-- goal should be breakfast
+
 breakfast if hotdrink juice food
 breakfast if hotdrink food
 

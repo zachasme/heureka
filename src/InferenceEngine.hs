@@ -1,30 +1,52 @@
 import Astar
 
+import Data.List
+import Data.Maybe
 import Debug.Trace
 
-datafilepath = "../data/pidgeon.txt"
 
-
-data Literal = Proposition String
-             | Denial (Literal)
+data Literal
+	= Positive String
+    | Negative String
 	deriving (Show, Ord, Eq)
 
 type Clause = [Literal]
+
+deny :: Literal -> Literal
+deny (Positive x) = Negative x
+deny (Negative x) = Positive x
+
+
+-- 
+resolve x y =
+	case complement of
+		Nothing -> Nothing
+		Just complement ->
+			Just $ (delete complement x) ++ (delete (deny complement) y)
+	where
+		complement = find (\literal -> deny literal `elem` y) x
+
+--
+resolveall x kb = nub $ catMaybes $ map (resolve x) kb
+
+
 
 
 parse :: String -> [Clause]
 parse text = map parseline (map words $ lines text)
 
 parseline :: [String] -> Clause
-parseline ("or":xs) = parseline xs
-parseline ("non":x:xs) = (Denial (Proposition x)):parseline xs
-parseline (x:xs) = (Proposition x ): parseline xs
+parseline ("if":xs) = map deny $ parseline xs
+parseline (x:xs) = (Positive x):parseline xs
 parseline _ = []
 
 
 
--- direct distance between two nodes
-distance x = length x
+
+
+
+
+datafilepath = "../data/breakfast.txt"
 
 
 main = do
@@ -32,14 +54,15 @@ main = do
 	-- | compute knowledgebase
 	let kb = parse datafile
 	-- | assign hypthesis
-	let hypothesis = Proposition "wat"
+	let hypothesis = Positive "breakfast"
 
 	-- * REFUTATION-PROOF
 	-- | origin is denial of hypothesis
-	let origin = [Denial hypothesis]
+	let origin = [deny hypothesis]
 	-- | target is empty clause
 	let target = []
 
-	let successors x = [([Proposition "arg"], 4, "lol")]
-	let heuristic x  = 1
+	let heuristic x  = fromIntegral $ length x
+	let successors x = map (\resolvent -> (resolvent, 1, resolvent)) $ resolveall x kb
+	--print $ resolveall origin kb
 	print $ Astar.search heuristic successors origin target

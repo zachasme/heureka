@@ -30,7 +30,7 @@ complements x y = Set.intersection x $ deny y
 
 -- A clause is a tautology if it contains complementary literals
 tautology :: Clause -> Bool
-tautology x = Set.null $ complements x x
+tautology x = not . Set.null $ complements x x
 
 
 
@@ -45,7 +45,9 @@ resolve x y
 
 --
 resolveall :: Clause -> [Clause] -> [Clause]
-resolveall x kb = catMaybes $ map (resolve x) kb
+resolveall x kb =
+	filter (not . tautology)
+	$ catMaybes $ map (resolve x) kb
 
 
 

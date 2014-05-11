@@ -15,8 +15,6 @@ data Literal
 type Clause = Set Literal
 
 
-deny' (Positive x) = Negative x
-deny' (Negative x) = Positive x
 
 -- Denies each literal in a given clause
 deny :: Clause -> Clause
@@ -73,7 +71,7 @@ refutationproof conjecture kb =
 		target = Set.empty
 		heuristic = fromIntegral . Set.size
 		successors (x:xs)
-			= map (\resolvent -> (resolvent, 1)) $ resolveall x $ nub $ kb
+			= map (\resolvent -> (resolvent, 1)) $ resolveall x $ nub $ kb++xs
 
 
 
@@ -82,15 +80,9 @@ main = do
 	datafile <- readFile "../data/breakfast.txt"
 	let kb = parse datafile
 	let conjecture = Set.fromList [Positive "breakfast"]
-	--print $ kb
-	--print $ resolveall (deny conjecture) kb
-	--print $ resolveall conjecture kb
 	print $ refutationproof conjecture kb
-	--print $ reverse path
 
 	datafile <- readFile "../data/ancestortest.txt"
 	let kb = parse datafile
 	let conjecture = Set.fromList [Positive "a", Positive "b"]
-	--let Just (path, cost) = refutationproof conjecture kb
-	--print $ reverse path
-	print "end"
+	print $ refutationproof conjecture kb

@@ -1,4 +1,6 @@
--- goal should be a b
+-- ancestor test
+-- should not work using input resolution
+-- should work using ancestor resolution
 
 if e
 e if f d
@@ -6,13 +8,4 @@ e f if d
 a d if c
 b c
 
-
-
-
-a b Nc
-
-Nb c
-
-
-
-a c Nc
+-- goal should be a b

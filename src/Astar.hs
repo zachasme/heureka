@@ -40,7 +40,7 @@ search heuristic successors origin target =
       -- in case target is reached, trace route from origin
       | current == target = Just $ (path, pathcost)
       -- during each iteration, successors are added to frontier
-      | otherwise = inner frontier'' interior' predecessors'
+      | otherwise = trace (show current) $ inner frontier'' interior' predecessors'
       where
         -- Find and remove node with lowest f-cost (best past distance + future estimate / heuristic)
         ((current, pathcost), frontier') = PMap.pop frontier

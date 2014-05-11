@@ -1,4 +1,18 @@
 -- goal should be a b
 
-a if b
-b if a
+if e
+e if f d
+e f if d
+a d if c
+b c
+
+
+
+
+a b Nc
+
+Nb c
+
+
+
+a c Nc

@@ -1,79 +1,96 @@
 import Astar
 
 import Data.List
+import Data.Set (Set)
+import qualified Data.Set as Set
 import Data.Maybe
 import Debug.Trace
 
 
 data Literal
 	= Positive String
-    | Negative String
+		| Negative String
 	deriving (Show, Ord, Eq)
 
-type Clause = [Literal]
-
-deny :: Literal -> Literal
-deny (Positive x) = Negative x
-deny (Negative x) = Positive x
+type Clause = Set Literal
 
 
--- 
-resolve x y =
-	case complement of
-		Nothing -> Nothing
-		Just complement ->
-			Just $ (delete complement x) ++ (delete (deny complement) y)
+deny' (Positive x) = Negative x
+deny' (Negative x) = Positive x
+
+-- Denies each literal in a given clause
+deny :: Clause -> Clause
+deny x = Set.map inner x
 	where
-		complement = find (\literal -> deny literal `elem` y) x
+		inner (Positive x) = Negative x
+		inner (Negative x) = Positive x
+
+-- Computes the complimentary literals between two clauses
+-- returns them as they are in the first clause
+complements :: Clause -> Clause -> Clause
+complements x y = Set.intersection x $ deny y
+
+-- A clause is a tautology if it contains complementary literals
+tautology :: Clause -> Bool
+tautology x = Set.null $ complements x x
+
+
+
+
+-- Computes the resolvent(s)
+resolve :: Clause -> Clause -> Maybe Clause
+resolve x y
+  | Set.null c = Nothing
+  | otherwise = Just $ Set.union (Set.difference x c) (Set.difference y $ deny c)
+	where c = complements x y
+
 
 --
-resolveall x kb = nub $ catMaybes $ map (resolve x) kb
-
+resolveall :: Clause -> [Clause] -> [Clause]
+resolveall x kb = catMaybes $ map (resolve x) kb
 
 
 
 parse :: String -> [Clause]
-parse text = map parseline (map words $ lines text)
+parse text = filter (not . Set.null) $ map parseline (map words $ lines text)
 
 parseline :: [String] -> Clause
-parseline ("--":_) = []
-parseline ("if":xs) = map deny $ parseline xs
-parseline (x:xs) = (Positive x):parseline xs
-parseline _ = []
+parseline ("--":_)  = Set.empty
+parseline ("if":xs) = deny $ parseline xs
+parseline (x:xs)    = Set.insert (Positive x) $ parseline xs
+parseline _         = Set.empty
 
 
 
 
 
 
-
-datafilepath = "../data/ancestortest.txt"
-
-hypothesis = [Positive "a", Positive "b"]
-
-
-
+refutationproof :: Clause -> [Clause] -> Maybe ([Clause],Double)
 refutationproof conjecture kb =
 	Astar.search heuristic successors origin target
 	where
-		origin = map deny conjecture
-		target = []
+		origin = deny conjecture
+		target = Set.empty
+		heuristic = fromIntegral . Set.size
+		successors (x:xs)
+			= map (\resolvent -> (resolvent, 1)) $ resolveall x $ nub $ kb
+
+
 
 
 main = do
-	datafile <- readFile datafilepath
-	-- | compute knowledgebase
+	datafile <- readFile "../data/breakfast.txt"
 	let kb = parse datafile
-	-- | assign hypthesis
-	let hypothesis = [Positive "a", Positive "b"]
+	let conjecture = Set.fromList [Positive "breakfast"]
+	--print $ kb
+	--print $ resolveall (deny conjecture) kb
+	--print $ resolveall conjecture kb
+	print $ refutationproof conjecture kb
+	--print $ reverse path
 
-	-- * REFUTATION-PROOF
-	-- | origin is denial of hypothesis
-	let origin = map deny hypothesis
-	-- | target is empty clause
-	let target = []
-
-	let heuristic x  = fromIntegral $ length x
-	let successors (x:xs) = map (\resolvent -> (resolvent, 1)) $ resolveall x kb
-	--print $ resolveall origin kb
-	print $ Astar.search heuristic successors origin target
+	datafile <- readFile "../data/ancestortest.txt"
+	let kb = parse datafile
+	let conjecture = Set.fromList [Positive "a", Positive "b"]
+	--let Just (path, cost) = refutationproof conjecture kb
+	--print $ reverse path
+	print "end"

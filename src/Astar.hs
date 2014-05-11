@@ -14,8 +14,10 @@ import qualified PriorityMap as PMap
 
 import Debug.Trace
 
-
-search :: (Show a,Ord a,Eq a)
+-- | the used node type must be orderable (a requirement of the map structure)
+-- and equatable (for testing whether goal has been reached)
+-- also showable for debugging (can safely be removed)
+search :: (Show a, Ord a, Eq a)
        => (a -> Double)           -- ^ heuristic:  a function that approximates future cost to nearest goal
        -> (a -> [(a, Double, b)]) -- ^ successors: a function that provides the next nodes, costs and arcs/etc
        -> a                       -- ^ origin:  node from which to start the search
@@ -50,7 +52,6 @@ search heuristic successors origin target =
         filtered = filter
           (\(node,cost,arc) -> (not $ Set.member node interior) && (checkfrontier pastcost frontier' (node,cost,arc)) )
           $ successors current
-        -- TODO: filter out those that already have better g-score
 
         -- push new nodes onto frontier
         frontier'' = foldl

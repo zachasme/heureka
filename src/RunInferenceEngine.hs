@@ -1,9 +1,9 @@
-import City
 import Astar
+import Clauses
 
 import Debug.Trace
 
-cityfilepath = "../data/testmap.txt"
+datafilepath = "../data/pidgeon.txt"
 
 
 
@@ -21,10 +21,12 @@ distance (x1,y1) (x2,y2) = sqrt(dx*dx+dy*dy)
 
 
 main = do
-	cityfile <- readFile cityfilepath
-	let city         = City.parse cityfile
-	let origin       = (1,1)
-	let target       = (2,4)
-	let successors x = map (\(node,arc) -> (node, distance node x, arc)) $ City.successors x city
-	let heuristic x  = distance x target
+	datafile <- readFile datafilepath
+	let clauses         = Clauses.parse datafile
+	--let origin       = City.intersection "SktPedersStraede" "Larsbjoernsstraede" city
+	--let target       = City.intersection "Studiestraede" "Larsbjoernsstraede" city
+	let origin = (0,0)
+	let target = (9,9)
+	let successors x = []
+	let heuristic x  = 1
 	print $ Astar.search heuristic successors origin target

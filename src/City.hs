@@ -105,3 +105,10 @@ main = do
 	let origin       = intersection "SktPedersStraede" "Larsbjoernsstraede" city
 	let target       = intersection "Studiestraede" "Larsbjoernsstraede" city
 	print $ findroute origin target city
+
+
+	cityfile <- readFile "../data/manhattan.txt"
+	let city         = parse cityfile
+	let origin       = (0,0)
+	let target       = (9,9)
+	print $ findroute origin target city

@@ -109,7 +109,8 @@ main = do
 	datafile <- readFile "../data/ancestortest.txt"
 	let kb = parse datafile
 	let conjecture = Set.fromList [Positive "a", Positive "b"]
-	print $ refutationproof conjecture kb
+	let  Just (path,_) = refutationproof conjecture kb
+	print $ reverse path
 
 	print "Direct breakfast:"
 	datafile <- readFile "../data/breakfast.txt"

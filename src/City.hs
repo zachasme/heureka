@@ -60,10 +60,11 @@ intersection road1 road2 (_, i) =
 
 
 
-route (a:b:path) (adjecents,lol) = arc: (route (b:path) (adjecents,lol) )
+route (a:b:path) city = arc:(route (b:path) city)
 	where
-		succs = fromJust $ Map.lookup a adjecents
-		(node,arc) = fromJust $ find (\(succ,_) -> succ == b) succs
+		(node,arc) = fromJust
+			$ find (\(succ,_) -> succ == b)
+			$ successors a city
 route _ _ = []
 
 

@@ -9,10 +9,11 @@ import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 
-type Street   = String
+type Street   	= String
+type Coordinate = (Int, Int)
 
-type AdjacencyMap = Map (Int,Int) [((Int,Int), Street)]
-type IncidenceMap = Map Street (Set (Int,Int))
+type AdjacencyMap = Map Coordinate [(Coordinate, Street)]
+type IncidenceMap = Map Street (Set Coordinate)
 
 type City = (AdjacencyMap, IncidenceMap)
 
@@ -28,7 +29,7 @@ parseTokens (adjacents, incidence) [x1,y1,road,x2,y2] = (adjacents', incidence')
 		origin = (read x1, read y1)
 		target = (read x2, read y2)
 		x = (target, road)
-		successors = case Map.lookup origin adjacents of
+		successors = case Map.lookup origin adjacents of	
 			Just xs -> x:xs
 			Nothing -> [x]
 		y = Set.fromList [origin, target]
@@ -43,14 +44,14 @@ parseTokens city _ = city
 
 
 
-successors :: (Int,Int) -> City -> [((Int,Int), Street)]
+successors :: Coordinate -> City -> [(Coordinate, Street)]
 successors node (a,_) = case Map.lookup node a of
 	Just x  -> x
 	Nothing -> []
 
 
 
-intersection :: Street -> Street -> City -> (Int,Int)
+intersection :: Street -> Street -> City -> Coordinate
 intersection road1 road2 (_, i) =
 	case (Map.lookup road1 i, Map.lookup road2 i) of
 		(Just xs, Just ys) -> head $ Set.toList $ Set.intersection xs ys
@@ -59,7 +60,8 @@ intersection road1 road2 (_, i) =
 
 
 --main = print $ [1]
-main = print $ test
+main = print $ test3
 
-test = intersection "vej1" "vej2" $ parse "10 10 vej1 20 20\n20 20 vej2 30 30\n10 10 vej3 30 30\n30 30 vej4 10 10"
-
+test1 = intersection "vej1" "vej2" $ parse "10 10 vej1 20 20\n20 20 vej2 30 30\n10 10 vej3 30 30\n30 30 vej4 10 10"
+test2 = parse "10 10 vej1 20 20\n20 20 vej2 30 30\n10 10 vej3 30 30\n30 30 vej4 10 10"
+test3 = successors (10, 10) $ parse "10 10 vej1 20 20\n20 20 vej2 30 30\n10 10 vej3 30 30\n30 30 vej4 10 10"

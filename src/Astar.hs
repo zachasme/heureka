@@ -7,12 +7,7 @@ import qualified Data.Set as Set
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-import Data.Maybe (fromJust)
-
---import qualified PMapueue as PMap
 import qualified PriorityMap as PMap
-
-import Debug.Trace
 
 -- | the used node type must be orderable (a requirement of the map structure)
 -- and equatable (for testing whether goal has been reached)

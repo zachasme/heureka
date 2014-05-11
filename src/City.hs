@@ -1,9 +1,5 @@
-module City
-( parse
-, successors
-, intersection
-, route
-) where
+import Astar
+
 
 import Data.List
 import Data.Maybe
@@ -21,11 +17,12 @@ type IncidenceMap = Map Street (Set Coordinate)
 
 type City = (AdjacencyMap, IncidenceMap)
 
+
+
+
+
 parse :: String -> City
 parse text = foldl parseTokens (Map.empty,Map.empty) (map words $ lines text)
-
-
-
 
 parseTokens :: City -> [String] -> City
 parseTokens (adjacents, incidence) [x1,y1,road,x2,y2] = (adjacents', incidence')
@@ -70,9 +67,40 @@ route (a:b:path) (adjecents,lol) = arc: (route (b:path) (adjecents,lol) )
 route _ _ = []
 
 
---main = print $ [1]
-main = print $ test3
 
-test1 = intersection "vej1" "vej2" $ parse "10 10 vej1 20 20\n20 20 vej2 30 30\n10 10 vej3 30 30\n30 30 vej4 10 10"
-test2 = parse "10 10 vej1 20 20\n20 20 vej2 30 30\n10 10 vej3 30 30\n30 30 vej4 10 10"
-test3 = successors (10, 10) $ parse "10 10 vej1 20 20\n20 20 vej2 30 30\n10 10 vej3 30 30\n30 30 vej4 10 10"
+
+
+cityfilepath = "../data/citymap.txt"
+
+
+
+--SktPedersStraede & Larsbjoernsstraede 35 80
+--to the corner of Studiestraede & Larsbjoernsstraede 45 70
+
+
+-- direct distance between two nodes
+distance :: (Int,Int) -> (Int,Int) -> Double
+distance (x1,y1) (x2,y2) = sqrt(dx*dx+dy*dy)
+	where
+		dx = fromIntegral x2 - fromIntegral x1
+		dy = fromIntegral y2 - fromIntegral y1
+		
+
+
+findroute :: Coordinate -> Coordinate -> City -> Maybe [Street]
+findroute origin target city =
+	case Astar.search heuristic successors' origin target of
+		Nothing -> Nothing
+		Just (path, cost) -> Just $ route (reverse path) city
+	where
+		heuristic x = distance x target
+		successors' path = map (\(node,arc) -> (node, distance node $ head path)) $ successors (head path) city
+
+
+
+main = do
+	cityfile <- readFile cityfilepath
+	let city         = parse cityfile
+	let origin       = intersection "SktPedersStraede" "Larsbjoernsstraede" city
+	let target       = intersection "Studiestraede" "Larsbjoernsstraede" city
+	print $ findroute origin target city

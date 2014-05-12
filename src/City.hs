@@ -80,8 +80,8 @@ cityfilepath = "../data/citymap.txt"
 
 
 -- direct distance between two nodes
-distance :: (Int,Int) -> (Int,Int) -> Double
-distance (x1,y1) (x2,y2) = sqrt(dx*dx+dy*dy)
+distance :: Coordinate -> Coordinate -> Double
+s (x1,y1) (x2,y2) = sqrt(dx*dx+dy*dy)
 	where
 		dx = fromIntegral x2 - fromIntegral x1
 		dy = fromIntegral y2 - fromIntegral y1
